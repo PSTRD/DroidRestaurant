@@ -26,18 +26,27 @@ import com.google.gson.Gson
 import androidx.compose.runtime.State
 import fr.isen.estrade.androiderestaurant.model.MenuResponse
 import android.util.Log
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import org.json.JSONObject
 import fr.isen.estrade.androiderestaurant.MenuDataRepository
+import fr.isen.estrade.androiderestaurant.model.CartViewModel
+import fr.isen.estrade.androiderestaurant.model.TopBar
 
 class CategoryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val menuResponseState = mutableStateOf<MenuResponse?>(null)
         val categoryName = intent.getStringExtra("categoryName") ?: ""
+        val dishDetailViewModel by viewModels<CartViewModel>()
+        val cartViewModel by viewModels<CartViewModel>()
+        cartViewModel.updateItemCount(applicationContext)
 
         fetchMenu(this,
             onResult = { menuResponse ->
@@ -48,10 +57,41 @@ class CategoryActivity : ComponentActivity() {
         )
 
         setContent {
+            val cartItemCount = dishDetailViewModel.cartItemCount.value
+
             AndroidERestaurantTheme {
-                MenuScreen(menuResponse = menuResponseState,categoryName,context=this)
+                Scaffold(
+                    topBar = {
+                        TopBar(
+                            title = "DroidRestaurant",
+                            cartItemCount = cartItemCount,
+                            showBackButton = true,
+                            onNavigateBack = {
+                                finish()
+                                //val homeIntent = Intent(this, HomeActivity::class.java)
+                                //HomeActivity::class.java
+                                //homeIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                //this.startActivity(homeIntent)
+                            }
+                        )
+                    }
+                ) { innerPadding -> // Ici, vous devez utiliser le paramètre content de Scaffold
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding), // Utilisez innerPadding pour respecter les paddings de Scaffold
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MenuScreen(menuResponse = menuResponseState,categoryName,context=this)
+                    }
+                }
             }
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        val cartViewModel by viewModels<CartViewModel>()
+        cartViewModel.updateItemCount(applicationContext)
     }
 }
 

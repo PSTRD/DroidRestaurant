@@ -3,7 +3,7 @@
     <string name="category_entrees">Entrées</string>
     <string name="category_plats">Plats</string>
     <string name="category_desserts">Desserts</string>
-
+    <string name="cart">Panier</string>
     <string-array name="entrees">
         <item>Entrée 1</item>
         <item>Entrée 2</item>

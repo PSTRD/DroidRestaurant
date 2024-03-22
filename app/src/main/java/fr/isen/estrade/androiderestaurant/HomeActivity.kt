@@ -1,36 +1,67 @@
 package fr.isen.estrade.androiderestaurant
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.isen.estrade.androiderestaurant.model.CartViewModel
+import fr.isen.estrade.androiderestaurant.model.TopBar
 import fr.isen.estrade.androiderestaurant.ui.theme.AndroidERestaurantTheme
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.Modifier
-import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 
 
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dishDetailViewModel by viewModels<CartViewModel>()
+        val cartViewModel by viewModels<CartViewModel>()
+        cartViewModel.updateItemCount(applicationContext)
+
         setContent {
+            val cartItemCount = dishDetailViewModel.cartItemCount.value
             AndroidERestaurantTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    RestaurantMenu()
+                Scaffold(
+                    topBar = {
+                        TopBar(title = "DroidRestaurant",
+                            cartItemCount = cartItemCount,
+                            showBackButton = false,
+                            onNavigateBack = {
+                                finish()
+                                //val homeIntent = Intent(this, HomeActivity::class.java)
+                                //homeIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                //this.startActivity(homeIntent)
+                            }
+                        )
+                    }
+                ) { innerPadding -> // Ici, vous devez utiliser le paramètre content de Scaffold
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding), // Utilisez innerPadding pour respecter les paddings de Scaffold
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        RestaurantMenu()
+                    }
                 }
             }
         }
@@ -39,7 +70,13 @@ class HomeActivity : ComponentActivity() {
         super.onDestroy()
         Log.d("HomeActivity", "L'activité Home est détruite.")
     }
+    override fun onResume() {
+        super.onResume()
+        val cartViewModel by viewModels<CartViewModel>()
+        cartViewModel.updateItemCount(applicationContext)
+    }
 }
+
 
 @Composable
 fun RestaurantMenu() {

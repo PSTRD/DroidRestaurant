@@ -8,5 +8,6 @@ data class Dish(
     val id: String,
     @SerializedName("name_fr") val nameFr: String,
     val images: List<String>,
-    val prices: List<Price>
+    val prices: List<Price>,
+    val ingredients: List<Ingredient>
 )

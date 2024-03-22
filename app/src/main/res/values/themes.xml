@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.AndroidERestaurant" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Thème de base de l'application utilisant Material Components. -->
+    <style name="Theme.AndroidERestaurant" parent="Theme.MaterialComponents.Light.NoActionBar">
+    </style>
 </resources>
